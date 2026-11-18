@@ -26,17 +26,21 @@
 
 ## 安装
 
-仓库已公开，无需 GitHub 账号或 `gh`。在目标服务器执行：
+仓库已公开，无需 GitHub 账号或 `gh`。下面的安装命令会先检查 `curl` 和系统 CA 证书；全新系统缺少它们时，会自动通过 `apt-get` 安装，再下载并运行安装器。
+
+**root 用户直接执行（不需要 `sudo`）：**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/chainfix/anytls/main/install.sh -o install-anytls.sh && sudo bash install-anytls.sh
+bash -c 'set -e; if ! command -v curl >/dev/null 2>&1 || [ ! -s /etc/ssl/certs/ca-certificates.crt ]; then apt-get update; apt-get install -y curl ca-certificates; fi; curl -fLsS --retry 2 --connect-timeout 15 https://raw.githubusercontent.com/chainfix/anytls/main/install.sh -o install-anytls.sh; bash install-anytls.sh'
 ```
 
-已使用 root 登录且未安装 `sudo` 时执行：
+**普通用户执行（需要 `sudo` 权限）：**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/chainfix/anytls/main/install.sh -o install-anytls.sh && bash install-anytls.sh
+sudo bash -c 'set -e; if ! command -v curl >/dev/null 2>&1 || [ ! -s /etc/ssl/certs/ca-certificates.crt ]; then apt-get update; apt-get install -y curl ca-certificates; fi; curl -fLsS --retry 2 --connect-timeout 15 https://raw.githubusercontent.com/chainfix/anytls/main/install.sh -o install-anytls.sh; bash install-anytls.sh'
 ```
+
+下载或依赖安装失败时会停止，不继续执行。已有 `curl` 和 CA 证书时直接下载；已下载的 `install.sh` 本身也会安装后续所需依赖。
 
 也可以先下载并查看脚本，再运行。脚本是独立文件，不依赖仓库里的其他文件；保存后执行还能自动安装管理菜单。
 
