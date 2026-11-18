@@ -10,6 +10,7 @@
 - IP 短期证书，每日两次检查续期，成功后自动部署证书并重启 AnyTLS。
 - 输出 AnyTLS 导入链接、Mihomo / Clash Meta 节点条目。
 - 重复运行保留配置和密码，并提供状态检查、续期演练和到期续期。
+- 忘记节点链接时，登录服务器执行 `sudo anytls link` 即可重新查看。
 
 ## 支持环境
 
@@ -62,6 +63,38 @@ sudo anytls
 ```
 
 若脚本通过管道运行而未保存为文件，管理入口可能无法复制；请保留下载后的脚本并重新执行。
+
+## 忘记节点链接时
+
+登录安装了本脚本的服务器，直接查询：
+
+```bash
+sudo anytls link
+```
+
+root 用户不需要 `sudo`：
+
+```bash
+anytls link
+```
+
+会从服务器现有配置读取并显示节点地址、端口、SNI、导入链接及 Mihomo 配置，不修改密码、不重装、不重启服务。链接包含密码，仅允许 root / sudo 查询。没有交互终端也能使用，例如通过 SSH 远程执行。
+
+查看服务和证书状态：
+
+```bash
+sudo anytls status
+```
+
+也可以运行 `sudo anytls`，选择 **2. 显示节点及客户端配置**。
+
+**已经安装旧版：** 原有菜单的选项 2 可以直接查询。若需要新增的 `link` / `status` 命令，仅更新管理脚本即可（不重新安装节点）：
+
+```bash
+curl -fLsS --retry 2 https://raw.githubusercontent.com/chainfix/anytls/main/install.sh -o install-anytls.sh && bash -n install-anytls.sh && sudo install -m 0700 install-anytls.sh /usr/local/sbin/anytls
+```
+
+root 用户将最后的 `sudo install` 改为 `install`。尚未安装管理入口时，也可用下载后的文件查询：`sudo bash install-anytls.sh link`。这些命令适用于本安装器创建的节点，不自动接管其他脚本或手动部署的服务。
 
 ## 端口与证书
 

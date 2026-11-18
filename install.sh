@@ -11,7 +11,7 @@ UNIT=anytls-node.service
 TIMER=anytls-node-renew.timer
 CERT_NAME=anytls-ip
 CERTBOT_VERSION=5.10.0
-SCRIPT_VERSION=1.0.0
+SCRIPT_VERSION=1.1.0
 TMP_DIR=
 INSTALL_STARTED=0
 INSTALL_OK=0
@@ -515,6 +515,7 @@ install_node() {
         fi
     fi
     info '安装完成，服务与证书续期定时器已开机自启。'
+    info '以后查看节点链接：sudo anytls link（root 用户直接运行 anytls link）。'
     if (( ENABLE_BBR )); then
         info "当前 TCP 算法：$(sysctl -n net.ipv4.tcp_congestion_control)；默认队列：$(sysctl -n net.core.default_qdisc)"
     fi
@@ -526,7 +527,15 @@ install_node() {
 main() {
     case ${1:-} in
         -h|--help)
-            printf 'AnyTLS 交互式安装器 %s\n运行：sudo bash install.sh\n已安装后：sudo anytls\n支持 Debian 12/13、Ubuntu 22.04/24.04，x86_64/ARM64，公网 IPv4。\n' "$SCRIPT_VERSION"
+            printf 'AnyTLS 交互式安装器 %s\n运行：sudo bash install.sh\n已安装后：sudo anytls\n查看节点链接：sudo anytls link\n查看服务状态：sudo anytls status\n支持 Debian 12/13、Ubuntu 22.04/24.04，x86_64/ARM64，公网 IPv4。\n' "$SCRIPT_VERSION"
+            return ;;
+        link)
+            require_root
+            show_node
+            return ;;
+        status)
+            require_root
+            show_status
             return ;;
         '') ;;
         *) die '未知参数；使用 --help 查看说明。' ;;

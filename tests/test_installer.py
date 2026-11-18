@@ -119,6 +119,33 @@ printf '\nRESULT:%s|%s' "$PORT" "$ENABLE_BBR"
             self.assertFalse(proxy['skip-cert-verify'])
             self.assertEqual(proxy['password'], password)
 
+    def test_link_command_without_terminal_is_read_only(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d)
+            state = {'ip': '1.1.1.1', 'port': 8443, 'name': 'query-test'}
+            config = {'inbounds': [{'users': [{'password': 'test-query-password'}]}]}
+            (p/'installed.json').write_text(json.dumps(state))
+            (p/'config.json').write_text(json.dumps(config))
+            before = {f.name: f.read_bytes() for f in p.iterdir()}
+            r = bash('CONFIG_DIR=$TEST_DIR; require_root() { :; }; main link', {'TEST_DIR': d})
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertIn('anytls://test-query-password@1.1.1.1:8443/', r.stdout)
+            self.assertEqual(before, {f.name: f.read_bytes() for f in p.iterdir()})
+
+    def test_link_requires_privileges_and_existing_install(self):
+        r = bash('require_root() { die "root required"; }; main link')
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn('root required', r.stderr)
+        with tempfile.TemporaryDirectory() as d:
+            r = bash('CONFIG_DIR=$TEST_DIR; require_root() { :; }; main link', {'TEST_DIR': d})
+            self.assertNotEqual(r.returncode, 0)
+            self.assertIn('还没有成功完成安装', r.stderr)
+
+    def test_status_without_terminal(self):
+        r = bash('require_root() { :; }; show_status() { printf "status-ok"; }; main status')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(r.stdout, 'status-ok')
+
     def test_unsupported_bbr_does_not_write_settings(self):
         code = '''
 ENABLE_BBR=1
