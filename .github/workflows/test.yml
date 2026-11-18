@@ -1,0 +1,30 @@
+name: Validate installer
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  static-and-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Shell syntax and lint
+        run: |
+          bash -n install.sh
+          shellcheck install.sh tests/*.sh
+      - name: Unit tests
+        run: bash tests/unit.sh
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build isolated test environment
+        run: docker build -f tests/Dockerfile -t anytls-test .
+      - name: Test actual proxy, TLS, renewal deployment and rollback
+        run: docker run --rm anytls-test

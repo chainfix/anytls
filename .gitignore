@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+*.log
+*.pem
+*.key
+*.crt
+.env
+config.json
+installed.json
