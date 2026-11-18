@@ -26,19 +26,19 @@
 
 ## 安装
 
-这是私有仓库，匿名访问 GitHub Raw 会返回 404。先用有仓库权限的 GitHub 账号登录 `gh`，在目标服务器执行：
+仓库已公开，无需 GitHub 账号或 `gh`。在目标服务器执行：
 
 ```bash
-gh repo clone chainfix/anytls && cd anytls && sudo bash install.sh
+curl -fsSL https://raw.githubusercontent.com/chainfix/anytls/main/install.sh -o install-anytls.sh && sudo bash install-anytls.sh
 ```
 
-已经安装并登录 `gh` 时，也可以只下载单个脚本后执行：
+已使用 root 登录且未安装 `sudo` 时执行：
 
 ```bash
-gh api repos/chainfix/anytls/contents/install.sh -H 'Accept: application/vnd.github.raw+json' > install-anytls.sh && sudo bash install-anytls.sh
+curl -fsSL https://raw.githubusercontent.com/chainfix/anytls/main/install.sh -o install-anytls.sh && bash install-anytls.sh
 ```
 
-服务器没有 `gh` 时，可在已登录 GitHub 的设备下载 `install.sh`，传到服务器后执行 `sudo bash install.sh`。脚本是独立文件，不依赖仓库里的其他文件。
+也可以先下载并查看脚本，再运行。脚本是独立文件，不依赖仓库里的其他文件；保存后执行还能自动安装管理菜单。
 
 安装时依次选择：
 
